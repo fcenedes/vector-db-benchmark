@@ -117,7 +117,7 @@
           { "parallel": 1, "search_params": { "force_flat": true } },
           { "parallel": 8, "search_params": { "force_flat": true } },
           { "parallel": 16, "search_params": { "force_flat": true } },
-          { "parallel": 32, "search_params": { "force_flat": true } }
+          { "parallel": 100, "search_params": { "force_flat": true } }
         ],
         "upload_params": { "parallel": 16 }
     }

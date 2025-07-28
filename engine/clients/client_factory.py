@@ -29,9 +29,6 @@ def _import_engine_classes(engine_name: str) -> Dict[str, Type]:
     if engine_name == "vectorsets":
         module_name = f"engine.clients.vectorsets"
         class_prefix = "RedisVset"
-    elif engine_name == "pgvector":
-        module_name = f"engine.clients.pgvector"
-        class_prefix = "PgVector"
     else:
         module_name = f"engine.clients.{engine_name}"
         # Convert first letter to uppercase for class name

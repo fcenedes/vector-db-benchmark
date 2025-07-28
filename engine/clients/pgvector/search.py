@@ -26,9 +26,16 @@ class PgvectorSearcher(BaseSearcher):
         cls.distance = distance
         cls.search_params = search_params["search_params"]
 
+        # For FLAT searches, disable index usage to force full scan
+        if "force_flat" in cls.search_params and cls.search_params["force_flat"]:
+            cls.cur.execute("SET enable_indexscan = off")
+            cls.cur.execute("SET enable_bitmapscan = off")
+
     @classmethod
     def search_one(cls, vector, meta_conditions, top) -> List[Tuple[int, float]]:
-        cls.cur.execute(f"SET hnsw.ef_search = {cls.search_params['hnsw_ef']}")
+        # Set HNSW ef_search parameter only if using HNSW index
+        if "hnsw_ef" in cls.search_params:
+            cls.cur.execute(f"SET hnsw.ef_search = {cls.search_params['hnsw_ef']}")
 
         if cls.distance == Distance.COSINE:
             query = f"SELECT id, embedding <=> %s AS _score FROM items ORDER BY _score LIMIT {top};"
@@ -46,5 +53,12 @@ class PgvectorSearcher(BaseSearcher):
     @classmethod
     def delete_client(cls):
         if cls.cur:
+            # Reset index settings if they were disabled for FLAT searches
+            if "force_flat" in cls.search_params and cls.search_params["force_flat"]:
+                try:
+                    cls.cur.execute("SET enable_indexscan = on")
+                    cls.cur.execute("SET enable_bitmapscan = on")
+                except:
+                    pass  # Connection might be closed already
             cls.cur.close()
             cls.conn.close()

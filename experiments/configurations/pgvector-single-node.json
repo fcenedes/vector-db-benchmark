@@ -102,5 +102,23 @@
           { "parallel": 100, "search_params": { "hnsw_ef": 64 } }, { "parallel": 100, "search_params": { "hnsw_ef": 128 } }, { "parallel": 100, "search_params": { "hnsw_ef": 256 } }, { "parallel": 100, "search_params": { "hnsw_ef": 512 } }
         ],
         "upload_params": { "parallel": 16 }
+    },
+    {
+        "name": "pgvector-flat",
+        "engine": "pgvector",
+        "connection_params": {},
+        "collection_params": {
+          "flat_config": {
+            "create_index": false,
+            "max_parallel_workers": "auto"
+          }
+        },
+        "search_params": [
+          { "parallel": 1, "search_params": { "force_flat": true } },
+          { "parallel": 8, "search_params": { "force_flat": true } },
+          { "parallel": 16, "search_params": { "force_flat": true } },
+          { "parallel": 32, "search_params": { "force_flat": true } }
+        ],
+        "upload_params": { "parallel": 16 }
     }
 ]

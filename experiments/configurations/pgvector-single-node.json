@@ -120,5 +120,20 @@
           { "parallel": 100, "search_params": { "force_flat": true } }
         ],
         "upload_params": { "parallel": 16 }
+    },
+    {
+        "name": "pgvector-flat-high-perf",
+        "engine": "pgvector",
+        "connection_params": {},
+        "collection_params": {
+          "flat_config": {
+            "create_index": false,
+            "max_parallel_workers": "auto"
+          }
+        },
+        "search_params": [
+          { "parallel": 1, "search_params": { "force_flat": true } }
+        ],
+        "upload_params": { "parallel": 16 }
     }
 ]

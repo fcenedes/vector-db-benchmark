@@ -7,7 +7,15 @@ from pgvector.psycopg import register_vector
 
 from engine.base_client.distances import Distance
 from engine.base_client.search import BaseSearcher
-from engine.clients.pgvector.config import get_db_config
+from engine.clients.pgvector.config import (
+    get_db_config,
+    PGVECTOR_MAX_PARALLEL_WORKERS_PER_GATHER,
+    PGVECTOR_PARALLEL_TUPLE_COST,
+    PGVECTOR_PARALLEL_SETUP_COST,
+    PGVECTOR_MIN_PARALLEL_TABLE_SCAN_SIZE,
+    PGVECTOR_FORCE_PARALLEL_MODE,
+    PGVECTOR_WORK_MEM,
+)
 from engine.clients.pgvector.parser import PgVectorConditionParser
 
 
@@ -26,10 +34,28 @@ class PgvectorSearcher(BaseSearcher):
         cls.distance = distance
         cls.search_params = search_params["search_params"]
 
-        # For FLAT searches, disable index usage to force full scan
+        # For FLAT searches, optimize for parallel execution
         if "force_flat" in cls.search_params and cls.search_params["force_flat"]:
-            cls.cur.execute("SET enable_indexscan = off")
-            cls.cur.execute("SET enable_bitmapscan = off")
+            # Note: We don't disable indexes globally since:
+            # 1. No vector index exists in FLAT mode (not created)
+            # 2. PostgreSQL will naturally do sequential scan for vector queries
+            # 3. Other indexes (for filtering, etc.) remain useful
+
+            # Configurable parallel execution settings for FLAT searches
+            # Priority: Environment variables (from config) > search_params > defaults
+            parallel_workers = cls.search_params.get("max_parallel_workers_per_gather", PGVECTOR_MAX_PARALLEL_WORKERS_PER_GATHER)
+            parallel_tuple_cost = cls.search_params.get("parallel_tuple_cost", PGVECTOR_PARALLEL_TUPLE_COST)
+            parallel_setup_cost = cls.search_params.get("parallel_setup_cost", PGVECTOR_PARALLEL_SETUP_COST)
+            min_parallel_size = cls.search_params.get("min_parallel_table_scan_size", PGVECTOR_MIN_PARALLEL_TABLE_SCAN_SIZE)
+            force_parallel = cls.search_params.get("force_parallel_mode", PGVECTOR_FORCE_PARALLEL_MODE)
+            work_mem = cls.search_params.get("work_mem", PGVECTOR_WORK_MEM)
+
+            cls.cur.execute(f"SET max_parallel_workers_per_gather = {parallel_workers}")
+            cls.cur.execute(f"SET parallel_tuple_cost = {parallel_tuple_cost}")
+            cls.cur.execute(f"SET parallel_setup_cost = {parallel_setup_cost}")
+            cls.cur.execute(f"SET min_parallel_table_scan_size = '{min_parallel_size}'")
+            cls.cur.execute(f"SET force_parallel_mode = {force_parallel}")
+            cls.cur.execute(f"SET work_mem = '{work_mem}'")
 
     @classmethod
     def search_one(cls, vector, meta_conditions, top) -> List[Tuple[int, float]]:
@@ -73,12 +99,5 @@ class PgvectorSearcher(BaseSearcher):
     @classmethod
     def delete_client(cls):
         if cls.cur:
-            # Reset index settings if they were disabled for FLAT searches
-            if "force_flat" in cls.search_params and cls.search_params["force_flat"]:
-                try:
-                    cls.cur.execute("SET enable_indexscan = on")
-                    cls.cur.execute("SET enable_bitmapscan = on")
-                except:
-                    pass  # Connection might be closed already
             cls.cur.close()
             cls.conn.close()

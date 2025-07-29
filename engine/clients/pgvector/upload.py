@@ -5,7 +5,7 @@ import psycopg
 from pgvector.psycopg import register_vector
 
 from engine.base_client.upload import BaseUploader
-from engine.clients.pgvector.config import get_db_config
+from engine.clients.pgvector.config import get_db_config, PGVECTOR_WORK_MEM
 
 
 class PgvectorUploader(BaseUploader):
@@ -43,7 +43,7 @@ class PgvectorUploader(BaseUploader):
             max_maintenance_workers = 8
 
         # Optimize memory settings for large uploads based on AWS recommendations
-        cls.conn.execute("SET maintenance_work_mem = '2GB'")
+        cls.conn.execute(f"SET maintenance_work_mem = '{PGVECTOR_WORK_MEM}'")
         cls.conn.execute(f"SET max_parallel_maintenance_workers = {max_maintenance_workers}")
 
     @classmethod

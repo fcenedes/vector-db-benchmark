@@ -13,7 +13,6 @@ from engine.clients.pgvector.config import (
     PGVECTOR_PARALLEL_TUPLE_COST,
     PGVECTOR_PARALLEL_SETUP_COST,
     PGVECTOR_MIN_PARALLEL_TABLE_SCAN_SIZE,
-    PGVECTOR_FORCE_PARALLEL_MODE,
     PGVECTOR_WORK_MEM,
 )
 from engine.clients.pgvector.parser import PgVectorConditionParser
@@ -47,14 +46,12 @@ class PgvectorSearcher(BaseSearcher):
             parallel_tuple_cost = cls.search_params.get("parallel_tuple_cost", PGVECTOR_PARALLEL_TUPLE_COST)
             parallel_setup_cost = cls.search_params.get("parallel_setup_cost", PGVECTOR_PARALLEL_SETUP_COST)
             min_parallel_size = cls.search_params.get("min_parallel_table_scan_size", PGVECTOR_MIN_PARALLEL_TABLE_SCAN_SIZE)
-            force_parallel = cls.search_params.get("force_parallel_mode", PGVECTOR_FORCE_PARALLEL_MODE)
             work_mem = cls.search_params.get("work_mem", PGVECTOR_WORK_MEM)
 
             cls.cur.execute(f"SET max_parallel_workers_per_gather = {parallel_workers}")
             cls.cur.execute(f"SET parallel_tuple_cost = {parallel_tuple_cost}")
             cls.cur.execute(f"SET parallel_setup_cost = {parallel_setup_cost}")
             cls.cur.execute(f"SET min_parallel_table_scan_size = '{min_parallel_size}'")
-            cls.cur.execute(f"SET force_parallel_mode = {force_parallel}")
             cls.cur.execute(f"SET work_mem = '{work_mem}'")
 
     @classmethod

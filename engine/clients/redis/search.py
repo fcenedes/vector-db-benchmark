@@ -113,9 +113,7 @@ class RedisSearcher(BaseSearcher):
         if cls.algorithm == "HNSW":
             # 'EF_RUNTIME' is irrelevant for 'ADHOC_BF' policy
             if cls.hybrid_policy != "ADHOC_BF":
-                # Only set EF if it exists in search params (not needed for FLAT)
-                if "ef" in cls.search_params["search_params"]:
-                    params_dict["EF"] = cls.search_params["search_params"]["ef"]
+                params_dict["EF"] = cls.search_params["search_params"]["ef"]
         if cls.algorithm == "SVS-VAMANA":
             params_dict["WS_SEARCH"] = cls.search_params["search_params"]["WS_SEARCH"]
         results = cls._ft.search(q, query_params=params_dict)

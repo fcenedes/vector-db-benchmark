@@ -87,8 +87,26 @@ class RedisSearcher(BaseSearcher):
             .dialect(4)
             .timeout(REDIS_QUERY_TIMEOUT)
         )
+        # Handle vector conversion properly - vector might come as bytes
+        try:
+            if isinstance(vector, bytes):
+                # If vector is bytes, try to convert back to numpy array
+                try:
+                    import struct
+                    num_floats = len(vector) // 4  # 4 bytes per float32
+                    vector_array = np.array(struct.unpack(f'{num_floats}f', vector), dtype=cls.np_data_type)
+                except struct.error:
+                    # If that fails, try to decode as numpy array
+                    vector_array = np.frombuffer(vector, dtype=cls.np_data_type)
+            elif isinstance(vector, np.ndarray):
+                vector_array = vector.astype(cls.np_data_type)
+            else:
+                # Convert list to numpy array
+                vector_array = np.array(vector, dtype=cls.np_data_type)
+        except Exception as e:
+            raise ValueError(f"Failed to convert vector to proper format. Vector type: {type(vector)}, Error: {e}")
         params_dict = {
-            "vec_param": np.array(vector).astype(cls.np_data_type).tobytes(),
+            "vec_param": vector_array.tobytes(),
             "K": top,
             **params,
         }

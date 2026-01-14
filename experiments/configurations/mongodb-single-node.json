@@ -1,0 +1,15 @@
+[
+  {
+    "name": "mongodb-default",
+    "engine": "mongodb",
+    "connection_params": {
+      "request_timeout": 10000
+    },
+    "collection_params": { "index_options": {  } },
+    "search_params": [
+      { "parallel": 1, "numCandidates": 128 }, { "parallel": 1, "numCandidates": 256 }, { "parallel": 1, "numCandidates": 512 },
+      { "parallel": 100, "numCandidates": 128 }, { "parallel": 100, "numCandidates": 256 }, { "parallel": 100, "numCandidates": 512 }
+    ],
+    "upload_params": { "parallel": 32 }
+  }
+]

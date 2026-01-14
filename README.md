@@ -333,3 +333,75 @@ See the examples in the [clients](./engine/clients) directory.
 
 Once all the necessary classes are implemented, you can register the engine in the [ClientFactory](./engine/clients/client_factory.py).
 
+## Running on Kubernetes
+
+You can run the benchmarks on Kubernetes using the provided manifests in the `k8s/` directory.
+
+### Prerequisites
+
+1. A Kubernetes cluster with `kubectl` configured
+2. The `vector-db-benchmark` Docker image available (either built locally or pushed to a registry)
+3. Access to the target vector databases from within the cluster
+
+### Setup
+
+1. **Configure secrets** - Edit `k8s/secrets.yaml` with your database credentials:
+
+```bash
+# Edit the secrets file with your actual credentials
+vim k8s/secrets.yaml
+
+# Apply the secrets
+kubectl apply -f k8s/secrets.yaml
+```
+
+2. **Create persistent volumes** - For storing results and datasets:
+
+```bash
+kubectl apply -f k8s/pvc.yaml
+```
+
+3. **Run the benchmark job**:
+
+```bash
+kubectl apply -f k8s/benchmark-job.yaml
+```
+
+### Customizing the Benchmark
+
+You can customize the benchmark by editing environment variables in `k8s/benchmark-job.yaml`:
+
+```yaml
+env:
+  - name: BENCH_DATASETS
+    value: "gist-960-euclidean"  # Change dataset
+  - name: BENCH_ENGINES
+    value: "redis"               # Change engine
+```
+
+### Monitoring
+
+```bash
+# Watch job status
+kubectl get jobs -w
+
+# View logs
+kubectl logs -f job/vector-db-benchmark
+
+# Get results (copy from PVC)
+kubectl cp <pod-name>:/app/results ./results
+```
+
+### Cleanup
+
+```bash
+# Delete the job
+kubectl delete -f k8s/benchmark-job.yaml
+
+# Delete PVCs (warning: deletes stored data)
+kubectl delete -f k8s/pvc.yaml
+
+# Delete secrets
+kubectl delete -f k8s/secrets.yaml
+```
+

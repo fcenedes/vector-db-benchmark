@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for vector-db-benchmark
 # Stage 1: Build environment
-FROM python:3.10-slim AS builder
+FROM python:3.13-slim AS builder
 
 # Build arguments for Git metadata
 ARG GIT_SHA
@@ -51,7 +51,7 @@ RUN if [ -z "$GIT_SHA" ]; then \
     echo "Built with GIT_SHA=${GIT_SHA}, GIT_DIRTY=${GIT_DIRTY}" > /code/build_info.txt
 
 # Stage 2: Runtime environment
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # Environment variables for Python
 ENV PYTHONFAULTHANDLER=1 \

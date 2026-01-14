@@ -1,0 +1,128 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vector-db-benchmark
+  labels:
+    app: vector-db-benchmark
+spec:
+  ttlSecondsAfterFinished: 864000  # Clean up after 240 hours (10 days)
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: vector-db-benchmark
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: benchmark
+          image: vector-db-benchmark:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              cd /app && ./run_bench.sh
+          env:
+            # Redis configuration
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: redis-host
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: redis-port
+            - name: REDIS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: redis-user
+            - name: REDIS_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: redis-auth
+            # MongoDB configuration
+            - name: MONGO_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-host
+            - name: MONGO_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-port
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-user
+            - name: MONGO_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-auth
+            - name: MONGO_READ_PREFERENCE
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-read-preference
+            - name: MONGO_WRITE_CONCERN
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: mongo-write-concern
+            # MongoDB Atlas configuration
+            - name: EMBEDDING_FIELD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: embedding-field-name
+            - name: ATLAS_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: atlas-db-name
+            - name: ATLAS_COLLECTION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: atlas-collection-name
+            - name: ATLAS_VECTOR_SEARCH_INDEX_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: atlas-vector-search-index-name
+            # Benchmark configuration
+            - name: BENCH_DATASETS
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: bench-datasets
+            - name: BENCH_ENGINES
+              valueFrom:
+                secretKeyRef:
+                  name: benchmark-secrets
+                  key: bench-engines
+          resources:
+            requests:
+              memory: "32Gi"
+              cpu: "32"
+            limits:
+              memory: "32Gi"
+              cpu: "32"
+          volumeMounts:
+            - name: results
+              mountPath: /app/results
+            - name: datasets
+              mountPath: /app/datasets
+      volumes:
+        - name: results
+          persistentVolumeClaim:
+            claimName: benchmark-results-pvc
+        - name: datasets
+          persistentVolumeClaim:
+            claimName: benchmark-datasets-pvc
+

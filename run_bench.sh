@@ -10,16 +10,32 @@ export REDIS_AUTH=performance
 export DATASETS=${BENCH_DATASETS:-"gist-960-euclidean"}
 export ENGINES=${BENCH_ENGINES:-"redis"}
 ############### MONGO ENV VARS #################
-export MONGO_PORT=${MONGO_PORT:-"27017"}
-export MONGO_HOST=${MONGO_HOST:-"cluster0.1234567.mongodb.net"}
-export MONGO_AUTH=${MONGO_AUTH:-"performance"}
-export MONGO_USER=${MONGO_USER:-"performance"}
+export MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING:-"mongodb+srv://performance:performance@cluster0.1234567.mongodb.net/?retryWrites=true&w=1&appName=vector-db-benchmark&readPreference=primary"}
+# extract PORT, HOST, USER, AUTH from connection string
+export MONGO_PORT=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*:([0-9]+).*|\1|')
+export MONGO_HOST=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+).*|\1|')
+export MONGO_USER=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+):([^@]+).*|\1|')
+export MONGO_AUTH=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+):([^@]+).*|\2|')
 export MONGO_READ_PREFERENCE=${MONGO_READ_PREFERENCE:-"primary"}
 export MONGO_WRITE_CONCERN=${MONGO_WRITE_CONCERN:-"1"}
 export EMBEDDING_FIELD_NAME=${EMBEDDING_FIELD_NAME:-"embedding"}
-export ATLAS_DB_NAME=${ATLAS_DB_NAME:-"vector-db"}
+export ATLAS_DB_NAME=${MONGO_DB:-"vector-db"}
 export ATLAS_COLLECTION_NAME=${ATLAS_COLLECTION_NAME:-"vector-collection"}
 export ATLAS_VECTOR_SEARCH_INDEX_NAME=${ATLAS_VECTOR_SEARCH_INDEX_NAME:-"vector-index"}
+
+
+#echo variables for debugging
+echo "REDIS_PORT: $REDIS_PORT"
+echo "REDIS_HOST: $REDIS_HOST"
+echo "REDIS_USER: $REDIS_USER"
+echo "REDIS_AUTH: $REDIS_AUTH"
+echo "DATASETS: $DATASETS"
+echo "ENGINES: $ENGINES"
+echo "MONGO_CONNECTION_STRING: $MONGO_CONNECTION_STRING"
+echo "MONGO_PORT: $MONGO_PORT"
+echo "MONGO_HOST: $MONGO_HOST"
+echo "MONGO_USER: $MONGO_USER"
+echo "MONGO_AUTH: $MONGO_AUTH"
 
 #activate poetry shell
 # shellcheck disable=SC2046

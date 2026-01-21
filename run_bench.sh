@@ -11,11 +11,11 @@ export DATASETS=${BENCH_DATASETS:-"gist-960-euclidean"}
 export ENGINES=${BENCH_ENGINES:-"redis"}
 ############### MONGO ENV VARS #################
 export MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING:-"mongodb+srv://performance:performance@cluster0.1234567.mongodb.net/?retryWrites=true&w=1&appName=vector-db-benchmark&readPreference=primary"}
-# extract PORT, HOST, USER, AUTH from connection string
+# extract PORT, HOST from connection string
 export MONGO_PORT=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*:([0-9]+).*|\1|')
 export MONGO_HOST=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+).*|\1|')
-export MONGO_USER=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+):([^@]+).*|\1|')
-export MONGO_AUTH=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+):([^@]+).*|\2|')
+export MONGO_USER=$(echo $MONGO_USER)
+export MONGO_AUTH=$(echo $MONGO_PASSWORD)
 export MONGO_READ_PREFERENCE=${MONGO_READ_PREFERENCE:-"primary"}
 export MONGO_WRITE_CONCERN=${MONGO_WRITE_CONCERN:-"1"}
 export EMBEDDING_FIELD_NAME=${EMBEDDING_FIELD_NAME:-"embedding"}

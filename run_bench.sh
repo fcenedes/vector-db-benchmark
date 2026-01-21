@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ############### Redis ENV VARS #################
-export REDIS_PORT=6739
-export REDIS_HOST=psc.122222.eu-west1-mz.gcp.cloud.rlrcp.com
-export REDIS_USER=default
-export REDIS_AUTH=performance
+export REDIS_PORT=${DB_PORT:-6739}
+export REDIS_HOST=${PRIVATE_ENDPOINT:-"psc.122222.eu-west1-mz.gcp.cloud.rlrcp.com"}
+export REDIS_USER=${REDIS_RW_USER:-"default"}
+export REDIS_AUTH=${REDIS_RW_PASSWORD:-"REPLACE_WITH_REDIS_PASSWORD"}
 ############### General ENV VARS #################
 # Define DATASETS env var - default to gist-960-euclidean if not set
 export DATASETS=${BENCH_DATASETS:-"gist-960-euclidean"}

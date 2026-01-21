@@ -1,21 +1,20 @@
 #!/bin/bash
 
 ############### Redis ENV VARS #################
-export REDIS_PORT=${DB_PORT:-6739}
-export REDIS_HOST=${PRIVATE_ENDPOINT:-"psc.122222.eu-west1-mz.gcp.cloud.rlrcp.com"}
+export REDIS_PORT=${REDIS_DB_PORT:-6739}
+export REDIS_HOST=${REDIS_HOST:-"psc.122222.eu-west1-mz.gcp.cloud.rlrcp.com"}
 export REDIS_USER=${REDIS_RW_USER:-"default"}
-export REDIS_AUTH=${REDIS_RW_PASSWORD:-"REPLACE_WITH_REDIS_PASSWORD"}
+export REDIS_AUTH=${REDIS_RW_PASS:-"REPLACE_WITH_REDIS_PASSWORD"}
 ############### General ENV VARS #################
 # Define DATASETS env var - default to gist-960-euclidean if not set
 export DATASETS=${BENCH_DATASETS:-"gist-960-euclidean"}
 export ENGINES=${BENCH_ENGINES:-"redis"}
 ############### MONGO ENV VARS #################
 export MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING:-"mongodb+srv://performance:performance@cluster0.1234567.mongodb.net/?retryWrites=true&w=1&appName=vector-db-benchmark&readPreference=primary"}
-# extract PORT, HOST from connection string
-export MONGO_PORT=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*:([0-9]+).*|\1|')
+# extract HOST, USER, AUTH from connection string
 export MONGO_HOST=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*@([^:/]+).*|\1|')
-export MONGO_USER=$(echo $MONGO_USER)
-export MONGO_AUTH=$(echo $MONGO_PASSWORD)
+export MONGO_USER=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*://([^:]+):.*|\1|')
+export MONGO_AUTH=$(echo $MONGO_CONNECTION_STRING | sed -E 's|.*://[^:]+:([^@]+)@.*|\1|')
 export MONGO_READ_PREFERENCE=${MONGO_READ_PREFERENCE:-"primary"}
 export MONGO_WRITE_CONCERN=${MONGO_WRITE_CONCERN:-"1"}
 export EMBEDDING_FIELD_NAME=${EMBEDDING_FIELD_NAME:-"embedding"}

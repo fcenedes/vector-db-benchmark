@@ -3,8 +3,8 @@ import os
 from pymongo.mongo_client import MongoClient
 
 MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
-MONGO_AUTH = os.getenv("MONGO_AUTH", "performance")
-MONGO_USER = os.getenv("MONGO_USER", "performance")
+MONGO_AUTH = os.getenv("MONGO_AUTH", "")
+MONGO_USER = os.getenv("MONGO_USER", "")
 MONGO_READ_PREFERENCE = os.getenv("MONGO_READ_PREFERENCE", "primary")
 MONGO_WRITE_CONCERN = os.getenv("MONGO_READ_PREFERENCE", "1")
 EMBEDDING_FIELD_NAME = os.getenv("EMBEDDING_FIELD_NAME", "embedding")

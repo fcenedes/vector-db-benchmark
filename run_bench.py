@@ -53,10 +53,10 @@ def run_experiment(experiment_name, dataset, host, description=""):
 
 def main():
     # ============== Redis ENV VARS ==============
-    os.environ["REDIS_PORT"] = os.getenv("REDIS_DB_PORT", "6739")
-    os.environ["REDIS_HOST"] = os.getenv("REDIS_HOST", "psc.122222.eu-west1-mz.gcp.cloud.rlrcp.com")
-    os.environ["REDIS_USER"] = os.getenv("REDIS_RW_USER", "default")
-    os.environ["REDIS_AUTH"] = os.getenv("REDIS_RW_PASS", "REPLACE_WITH_REDIS_PASSWORD")
+    os.environ["REDIS_PORT"] = os.getenv("REDIS_DB_PORT", "")
+    os.environ["REDIS_HOST"] = os.getenv("REDIS_HOST", "")
+    os.environ["REDIS_USER"] = os.getenv("REDIS_RW_USER", "")
+    os.environ["REDIS_AUTH"] = os.getenv("REDIS_RW_PASS", "")
     
     # ============== General ENV VARS ==============
     os.environ["DATASETS"] = os.getenv("BENCH_DATASETS", "gist-960-euclidean")
@@ -65,7 +65,7 @@ def main():
     # ============== MONGO ENV VARS ==============
     mongo_connection_string = os.getenv(
         "MONGO_CONNECTION_STRING",
-        "mongodb+srv://performance:performance@cluster0.1234567.mongodb.net/?retryWrites=true&w=1&appName=vector-db-benchmark&readPreference=primary"
+        ""
     )
     os.environ["MONGO_CONNECTION_STRING"] = mongo_connection_string
     
